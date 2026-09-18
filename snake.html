@@ -229,10 +229,10 @@ footer.note{margin-top:18px;padding-top:12px;border-top:1px solid var(--line);
         <legend>Google 試算表（成績上傳）</legend>
         <p class="hintline">貼上 Apps Script 網頁應用程式的 <b>/exec</b> 網址，每局結束後會自動把成績寫進試算表；留空則只顯示在畫面上。網址與姓名、班級都存在這台裝置的瀏覽器裡。</p>
         <input id="p-endpoint" class="wide" type="url" autocomplete="off"
-               placeholder="https://script.google.com/macros/s/AKfy…/exec">
+               placeholder="">
         <p class="hintline" style="margin-top:8px">通行碼：要和 Apps Script 裡 <b>TOKEN</b> 那一行填的字串完全相同。兩邊都留空就不檢查。</p>
         <input id="p-token" class="wide" type="text" autocomplete="off" spellcheck="false"
-               placeholder="例如 gugong2026">
+               placeholder="">
         <div class="opts" style="margin-top:8px">
           <button id="btn-test">測試連線</button>
           <button id="btn-flush">補傳待上傳成績</button>
