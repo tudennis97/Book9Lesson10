@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>故宮貪食蛇 ── 學華語向前走 第九冊 第十課</title>
+<meta name="description" content="配合《學華語向前走》第九冊第十課〈故宮博物院〉的貪食蛇華語練習遊戲：看意思吃詞、選詞填空、照字序吃字。單一 HTML 檔，無外部連結。">
+<style>
+:root{
+  --lacquer:#17100f;
+  --panel:#241a18;
+  --panel-2:#2f2220;
+  --vermilion:#c8402f;
+  --gold:#d8a94b;
+  --jade:#7fa88c;
+  --silk:#f2e8d5;
+  --muted:#a2917f;
+  --line:#43302b;
+  --ink:#171210;
+  --serif:"Noto Serif CJK TC","Noto Serif TC","Source Han Serif TC","Songti TC","PMingLiU",serif;
+  --sans:"Noto Sans CJK TC","Noto Sans TC","PingFang TC","Microsoft JhengHei","Heiti TC",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background:radial-gradient(120% 80% at 50% -10%,#2b1b17 0%,transparent 60%),var(--lacquer);
+  color:var(--silk);font-family:var(--sans);font-size:15px;
+  -webkit-text-size-adjust:100%;
+}
+img{max-width:100%}
+[hidden]{display:none !important}
+.wrap{max-width:640px;margin:0 auto;padding-inline:16px;padding-block:18px 32px}
+
+/* 標題 */
+.masthead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;
+  border-bottom:2px solid var(--vermilion);padding-bottom:10px;margin-bottom:14px;flex-wrap:wrap}
+.masthead h1{font-family:var(--serif);font-weight:900;font-size:1.7rem;line-height:1.1;margin:0;
+  letter-spacing:.06em;text-wrap:balance}
+.masthead .lesson{font-size:.72rem;letter-spacing:.1em;color:var(--gold);text-align:right;line-height:1.6}
+
+/* 計分 */
+.hud{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 10px;padding:0}
+.hud>div{flex:1 1 0;min-width:70px;background:var(--panel);border:1px solid var(--line);padding:6px 10px}
+.hud dt{font-size:.64rem;letter-spacing:.14em;color:var(--muted);margin:0 0 2px}
+.hud dd{margin:0;font-family:var(--serif);font-weight:700;font-size:1.12rem;
+  font-variant-numeric:tabular-nums;color:var(--gold)}
+.hud dd.hearts{color:var(--vermilion);letter-spacing:.06em}
+
+/* 題目 */
+.quiz{background:linear-gradient(180deg,var(--panel-2),var(--panel));
+  border:1px solid var(--line);border-left:4px solid var(--gold);
+  padding:11px 14px;margin-bottom:10px;min-height:84px;
+  display:flex;flex-direction:column;justify-content:center;gap:5px}
+.quiz .tag{font-size:.65rem;letter-spacing:.16em;color:var(--gold)}
+.quiz .prompt{font-family:var(--serif);font-size:1.08rem;line-height:1.65;text-wrap:balance}
+.quiz .prompt em{font-style:normal;color:var(--jade);border-bottom:2px solid var(--jade);padding:0 .3em}
+.quiz .prompt b{color:var(--gold);font-weight:700}
+.quiz .prompt s{text-decoration:none;color:var(--muted)}
+.quiz .hint{font-size:.76rem;color:var(--muted);line-height:1.5}
+
+/* 棋盤 */
+.board{position:relative;border:1px solid var(--line);box-shadow:inset 0 0 0 4px #1d1512;
+  background:#12100f;line-height:0}
+canvas{display:block;width:100%;height:auto;touch-action:none}
+.veil{position:absolute;inset:0;background:rgba(18,13,12,.94);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;padding:18px;text-align:center;line-height:1.6;overflow-y:auto}
+.veil h2{font-family:var(--serif);font-size:1.3rem;margin:0;color:var(--gold);letter-spacing:.06em}
+.veil p{margin:0;font-size:.85rem;color:var(--muted);max-width:36ch}
+.veil p.keys{color:var(--silk);font-size:.78rem}
+.review{width:100%;text-align:left;display:flex;flex-direction:column;gap:6px}
+.review .row{background:var(--panel);border:1px solid var(--line);
+  border-left:3px solid var(--vermilion);padding:6px 9px}
+.review .w{font-family:var(--serif);font-size:1rem}
+.review .z{font-size:.7rem;color:var(--gold);margin-left:.5em}
+.review .d{font-size:.75rem;color:var(--muted);margin-top:2px;line-height:1.5}
+
+/* 按鈕 */
+button{font-family:inherit;font-size:.86rem;font-weight:500;color:var(--silk);
+  background:var(--panel-2);border:1px solid var(--line);padding:8px 14px;cursor:pointer;
+  transition:background .15s,border-color .15s}
+button:hover{background:#3d2c27;border-color:var(--gold)}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button.primary{background:var(--vermilion);border-color:var(--vermilion);color:#fff7ee;font-weight:700}
+button.primary:hover{background:#d8523f;border-color:var(--gold)}
+
+.pad{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(2,48px);
+  gap:6px;justify-content:center;margin:12px auto 0}
+.pad button{padding:0;font-size:1.05rem;color:var(--gold)}
+.pad .u{grid-column:2;grid-row:1}
+.pad .l{grid-column:1;grid-row:2}
+.pad .d{grid-column:2;grid-row:2}
+.pad .r{grid-column:3;grid-row:2}
+.actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+
+/* 玩家資料與上傳狀態 */
+.player{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.player label{flex:1 1 140px;display:flex;flex-direction:column;gap:3px;
+  font-size:.66rem;letter-spacing:.14em;color:var(--muted)}
+.player input{background:#150f0e;color:var(--silk);border:1px solid var(--line);
+  padding:7px 9px;font-family:var(--serif);font-size:.95rem}
+.player input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.sync{margin-top:10px;font-size:.75rem;color:var(--muted);text-align:center;
+  min-height:1.3em;line-height:1.5}
+.sync.ok{color:var(--jade)}
+.sync.bad{color:var(--vermilion)}
+.sync.busy{color:var(--gold)}
+input.wide{width:100%;background:#150f0e;color:var(--silk);border:1px solid var(--line);
+  padding:7px 9px;font-family:var(--sans);font-size:.78rem}
+input.wide:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.hintline{font-size:.72rem;color:var(--muted);line-height:1.7;margin:0 0 7px}
+.lb{width:100%;border-collapse:collapse;font-size:.82rem}
+.lb th,.lb td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left}
+.lb th{font-size:.66rem;letter-spacing:.1em;color:var(--muted);font-weight:500}
+.lb td.r{color:var(--gold);font-variant-numeric:tabular-nums;width:2.4em}
+.lb td.sc,.lb th.sc{text-align:right;font-variant-numeric:tabular-nums}
+.lb td.sc{color:var(--gold)}
+
+/* 摺疊面板 */
+details.box{margin-top:14px;border:1px solid var(--line);background:var(--panel)}
+details.box>summary{cursor:pointer;padding:9px 13px;font-size:.8rem;letter-spacing:.1em;
+  color:var(--gold);list-style:none}
+details.box>summary::-webkit-details-marker{display:none}
+details.box>summary::before{content:"◈ ";color:var(--vermilion)}
+.body{padding:2px 13px 14px;display:flex;flex-direction:column;gap:14px}
+fieldset{border:0;padding:0;margin:0}
+legend{font-size:.67rem;letter-spacing:.14em;color:var(--muted);padding:0 0 6px}
+.opts{display:flex;flex-wrap:wrap;gap:6px 14px}
+label.opt{display:inline-flex;align-items:center;gap:6px;font-size:.84rem;cursor:pointer}
+label.opt input{accent-color:var(--vermilion);width:16px;height:16px}
+
+/* 課文與生詞 */
+.text p{font-family:var(--serif);font-size:1rem;line-height:2;margin:0 0 .85em;text-indent:2em}
+.text p:last-child{margin-bottom:0}
+.vocab{width:100%;border-collapse:collapse;font-size:.8rem}
+.vocab th,.vocab td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}
+.vocab th{font-size:.66rem;letter-spacing:.1em;color:var(--muted);font-weight:500;white-space:nowrap}
+.vocab td.n{color:var(--muted);font-variant-numeric:tabular-nums;width:2em}
+.vocab td.w{font-family:var(--serif);font-size:.95rem;white-space:nowrap}
+.vocab td.z{color:var(--gold);white-space:nowrap;font-size:.74rem}
+.vocab td.e{color:var(--muted)}
+.scroll{overflow-x:auto}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--panel-2);padding:4px 9px;font-size:.8rem;
+  font-family:var(--serif)}
+.chip small{font-family:var(--sans);font-size:.66rem;color:var(--gold);margin-left:.4em}
+.pattern{font-size:.84rem;line-height:1.9;margin:0;padding-left:1.1em}
+.pattern b{color:var(--gold)}
+
+footer.note{margin-top:18px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:.72rem;color:var(--muted);line-height:1.75}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>故宮貪食蛇</h1>
+    <div class="lesson">學華語向前走　第九冊<br>第十課　故宮博物院</div>
+  </header>
+
+  <dl class="hud">
+    <div><dt>分數</dt><dd id="s-score">0</dd></div>
+    <div><dt>連對</dt><dd id="s-combo">0</dd></div>
+    <div><dt>答對</dt><dd id="s-right">0</dd></div>
+    <div><dt>生命</dt><dd class="hearts" id="s-life">♥♥♥</dd></div>
+  </dl>
+
+  <div class="player">
+    <label>姓名 <input id="p-name" type="text" maxlength="12" placeholder="王小明" autocomplete="off"></label>
+    <label>班級 <input id="p-class" type="text" maxlength="12" placeholder="九年甲班" autocomplete="off"></label>
+  </div>
+
+  <section class="quiz" aria-live="polite">
+    <div class="tag" id="q-tag">準備開始</div>
+    <div class="prompt" id="q-prompt">按「開始遊戲」，帶著小蛇逛故宮。</div>
+    <div class="hint" id="q-hint">本課生詞 27 個、課文填空 30 句</div>
+  </section>
+
+  <div class="board">
+    <canvas id="cv" width="540" height="420" aria-label="遊戲畫面"></canvas>
+    <div class="veil" id="veil"></div>
+  </div>
+
+  <div class="pad" aria-label="方向鍵">
+    <button class="u" data-dir="u" aria-label="上">▲</button>
+    <button class="l" data-dir="l" aria-label="左">◀</button>
+    <button class="d" data-dir="d" aria-label="下">▼</button>
+    <button class="r" data-dir="r" aria-label="右">▶</button>
+  </div>
+
+  <div class="actions">
+    <button id="btn-pause">暫停 / 繼續</button>
+    <button id="btn-restart">重新開始</button>
+  </div>
+
+  <div class="sync" id="sync"></div>
+
+  <details class="box">
+    <summary>遊戲設定</summary>
+    <div class="body">
+      <fieldset>
+        <legend>練習模式（可多選，遊戲中隨機出題）</legend>
+        <div class="opts">
+          <label class="opt"><input type="checkbox" id="m-mean" checked> 看意思吃正確的詞</label>
+          <label class="opt"><input type="checkbox" id="m-cloze" checked> 選詞填空</label>
+          <label class="opt"><input type="checkbox" id="m-order" checked> 照字序吃字</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>顯示</legend>
+        <div class="opts">
+          <label class="opt"><input type="checkbox" id="opt-zhuyin" checked> 詞語上方顯示注音</label>
+          <label class="opt"><input type="checkbox" id="opt-en"> 「看意思」題目一併顯示英文</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>速度</legend>
+        <div class="opts">
+          <label class="opt"><input type="radio" name="spd" value="230"> 慢</label>
+          <label class="opt"><input type="radio" name="spd" value="170" checked> 中</label>
+          <label class="opt"><input type="radio" name="spd" value="125"> 快</label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Google 試算表（成績上傳）</legend>
+        <p class="hintline">貼上 Apps Script 網頁應用程式的 <b>/exec</b> 網址，每局結束後會自動把成績寫進試算表；留空則只顯示在畫面上。網址與姓名、班級都存在這台裝置的瀏覽器裡。</p>
+        <input id="p-endpoint" class="wide" type="url" autocomplete="off"
+               placeholder="https://script.google.com/macros/s/AKfy…/exec">
+        <p class="hintline" style="margin-top:8px">通行碼：要和 Apps Script 裡 <b>TOKEN</b> 那一行填的字串完全相同。兩邊都留空就不檢查。</p>
+        <input id="p-token" class="wide" type="text" autocomplete="off" spellcheck="false"
+               placeholder="例如 gugong2026">
+        <div class="opts" style="margin-top:8px">
+          <button id="btn-test">測試連線</button>
+          <button id="btn-flush">補傳待上傳成績</button>
+        </div>
+      </fieldset>
+    </div>
+  </details>
+
+  <details class="box" id="lb-box">
+    <summary>班級排行榜（讀取試算表）</summary>
+    <div class="body">
+      <p class="hintline" id="lb-msg">展開後會從試算表讀取每個人的最高分。</p>
+      <div class="scroll"><table class="lb" id="lb-table"></table></div>
+    </div>
+  </details>
+
+  <details class="box">
+    <summary>課文</summary>
+    <div class="body text" id="lesson-text"></div>
+  </details>
+
+  <details class="box">
+    <summary>生詞／短語（27）</summary>
+    <div class="body"><div class="scroll"><table class="vocab" id="vocab-table"></table></div></div>
+  </details>
+
+  <details class="box">
+    <summary>習寫漢字、認讀漢字與句型</summary>
+    <div class="body">
+      <fieldset>
+        <legend>習寫漢字（筆畫數／部首）</legend>
+        <div class="chips" id="hanzi-chips"></div>
+      </fieldset>
+      <fieldset>
+        <legend>認讀漢字</legend>
+        <div class="chips" id="read-chips"></div>
+      </fieldset>
+      <fieldset>
+        <legend>句型</legend>
+        <ol class="pattern">
+          <li><b>量詞（棵／件／幅）</b>：故宮博物院每一<b>件</b>寶物都值得好好地欣賞。</li>
+          <li><b>……達（多達／高達）</b>：臺北故宮的藝術品多<b>達</b>六十五萬件以上。</li>
+          <li><b>仔細一＋V</b>：<b>仔細一</b>看，綠色的菜葉上還有蟲呢！</li>
+        </ol>
+      </fieldset>
+    </div>
+  </details>
+
+  <footer class="note">
+    教材依據：僑務委員會《學華語向前走》第九冊（9B）第十課〈故宮博物院〉，課文、生詞、習寫漢字與句型均取自課本。<br>
+  </footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ============================================================
+   〇、Google 試算表設定
+   想讓全班共用同一個試算表、又不必每台裝置各自設定，
+   就把 /exec 網址與通行碼直接寫在下面兩行的引號中間。
+   通行碼必須和 Apps Script 裡的 TOKEN 完全一樣；兩邊都留空則不檢查。
+   ============================================================ */
+var DEFAULT_ENDPOINT = "https://script.google.com/macros/s/AKfycbzZDL01Yr6sKOrNgUwIiqfol5gbUME7ZissEdFL6NBZ3KlqWM_amZa9zjVF8Fhvgp-zjw/exec";
+
+var DEFAULT_TOKEN = "gugong2026";
+
+var LS = {
+  ep:"gugong-snake-endpoint",
+  tk:"gugong-snake-token",
+  nm:"gugong-snake-name",
+  cl:"gugong-snake-class",
+  q :"gugong-snake-queue"
+};
+function lsGet(k,d){ try{ var v=localStorage.getItem(k); return v===null?d:v; }catch(e){ return d; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+
+/* ============================================================
+   一、課本內容（第九冊 第十課 故宮博物院）
+   ============================================================ */
+
+var TEXT = [
+ "去年暑假回臺灣的時候，我們全家去了臺北的故宮博物院，是一個很難忘的回憶。",
+ "「故宮」以前是紫禁城。紫禁城是明朝和清朝皇帝居住的皇宮。西元1911年建立了中華民國以後，改名叫「故宮」，變成博物館，收藏了很多寶物。後來因為戰爭的關係，把寶物搬到了臺灣，在臺北按照傳統皇宮的外型，蓋了臺北故宮博物院。",
+ "臺北故宮保存著五千年的藝術品，多達六十五萬件以上，其中「翠玉白菜」、「肉形石」和「毛公鼎」是故宮三寶。三寶裡的「翠玉白菜」最受歡迎，它是利用玉本來的顏色刻出一棵白菜，仔細一看，綠色的菜葉上還有蟲呢！",
+ "另外，有一幅很長的畫，叫「清明上河圖」，這幅畫把一般人民的生活畫得很生動。畫中有八百多人，每一個人的表情、衣服都不一樣；還畫了很多的動物、船、房屋、樹木，栩栩如生，讓我印象深刻。"
+];
+
+/* w 詞語 ｜ z 注音（逐字，以空格分隔）｜ p 拼音 ｜ e 課本英譯 ｜ d 中文說明 ｜ n 課本編號 */
+var WORDS = [
+ {n:1, w:"故宮博物院", z:"ㄍㄨˋ ㄍㄨㄥ ㄅㄛˊ ㄨˋ ㄩㄢˋ", p:"gù gōng bó wù yuàn", e:"National Palace Museum", d:"臺北收藏中國歷代寶物的博物館，前身是紫禁城的收藏"},
+ {n:2, w:"回憶", z:"ㄏㄨㄟˊ ㄧˋ", p:"huí yì", e:"memories", d:"想起以前經歷過的事；也指想起來的那些事"},
+ {n:3, w:"紫禁城", z:"ㄗˇ ㄐㄧㄣˋ ㄔㄥˊ", p:"zǐ jìn chéng", e:"The Forbidden City", d:"北京的舊皇宮，一般人不能進去，所以叫「禁城」"},
+ {n:4, w:"明朝", z:"ㄇㄧㄥˊ ㄔㄠˊ", p:"míng cháo", e:"Ming Dynasty", d:"中國的一個朝代，在清朝以前"},
+ {n:5, w:"清朝", z:"ㄑㄧㄥ ㄔㄠˊ", p:"qīng cháo", e:"Qing Dynasty", d:"中國最後一個朝代，在明朝以後"},
+ {n:6, w:"皇帝", z:"ㄏㄨㄤˊ ㄉㄧˋ", p:"huáng dì", e:"emperor", d:"古代國家最高的統治者"},
+ {n:7, w:"皇宮", z:"ㄏㄨㄤˊ ㄍㄨㄥ", p:"huáng gōng", e:"Imperial Palace", d:"皇帝居住和辦事的地方"},
+ {n:8, w:"改名", z:"ㄍㄞˇ ㄇㄧㄥˊ", p:"gǎi míng", e:"rename", d:"把原來的名字換成另一個名字"},
+ {n:9, w:"收藏", z:"ㄕㄡ ㄘㄤˊ", p:"shōu cáng", e:"collect", d:"把珍貴的東西收起來好好保管"},
+ {n:10, w:"寶物", z:"ㄅㄠˇ ㄨˋ", p:"bǎo wù", e:"treasure", d:"非常珍貴的東西"},
+ {n:11, w:"戰爭", z:"ㄓㄢˋ ㄓㄥ", p:"zhàn zhēng", e:"war", d:"國家或民族之間用武力互相攻打"},
+ {n:12, w:"保存", z:"ㄅㄠˇ ㄘㄨㄣˊ", p:"bǎo cún", e:"preserve", d:"讓東西維持原來的樣子，不受損壞"},
+ {n:13, w:"藝術品", z:"ㄧˋ ㄕㄨˋ ㄆㄧㄣˇ", p:"yì shù pǐn", e:"work of art", d:"字畫、雕刻、器物等有藝術價值的作品"},
+ {n:14, w:"達", z:"ㄉㄚˊ", p:"dá", e:"reach (a number)", d:"到達某個數量，常說「多達」、「高達」"},
+ {n:15, w:"翠玉白菜", z:"ㄘㄨㄟˋ ㄩˋ ㄅㄞˊ ㄘㄞˋ", p:"cuì yù bái cài", e:"Jadeite Cabbage with Insects", d:"故宮三寶之一，利用玉本來半白半綠的顏色刻成白菜"},
+ {n:16, w:"肉形石", z:"ㄖㄡˋ ㄒㄧㄥˊ ㄕˊ", p:"ròu xíng shí", e:"Meat-shaped Stone", d:"故宮三寶之一，一塊看起來像東坡肉的石頭"},
+ {n:17, w:"毛公鼎", z:"ㄇㄠˊ ㄍㄨㄥ ㄉㄧㄥˇ", p:"máo gōng dǐng", e:"Cauldron of the Duke Mao", d:"故宮三寶之一，西周的青銅鼎，內壁刻有長篇銘文"},
+ {n:18, w:"利用", z:"ㄌㄧˋ ㄩㄥˋ", p:"lì yòng", e:"use", d:"拿現有的條件或東西來達到目的"},
+ {n:19, w:"刻", z:"ㄎㄜ", p:"kē", e:"carve, engrave, incise", d:"用刀在玉、石、木頭上雕出形狀或花紋"},
+ {n:20, w:"仔細", z:"ㄗˇ ㄒㄧˋ", p:"zǐ xì", e:"carefully, meticulously", d:"很小心、很用心，一點一點地看或做"},
+ {n:21, w:"菜葉", z:"ㄘㄞˋ ㄧㄝˋ", p:"cài yè", e:"vegetable leaf", d:"蔬菜的葉子"},
+ {n:22, w:"蟲", z:"ㄔㄨㄥˊ", p:"chóng", e:"insect", d:"昆蟲；翠玉白菜的菜葉上就刻了兩隻蟲"},
+ {n:23, w:"幅", z:"ㄈㄨˊ", p:"fú", e:"measure word for paintings", d:"畫的量詞，如「一幅畫」"},
+ {n:24, w:"清明上河圖", z:"ㄑㄧㄥ ㄇㄧㄥˊ ㄕㄤˋ ㄏㄜˊ ㄊㄨˊ", p:"qīng míng shàng hé tú", e:"Along the River During the Qingming Festival", d:"一幅很長的畫，畫出一般人民生動的生活景象"},
+ {n:25, w:"房屋", z:"ㄈㄤˊ ㄨ", p:"fáng wū", e:"house", d:"供人居住的建築物"},
+ {n:26, w:"栩栩如生", z:"ㄒㄩˇ ㄒㄩˇ ㄖㄨˊ ㄕㄥ", p:"xǔ xǔ rú shēng", e:"lifelike", d:"畫的或雕的東西像活的一樣"},
+ {n:27, w:"深刻", z:"ㄕㄣ ㄎㄜˋ", p:"shēn kè", e:"profound", d:"感受或印象很強烈，不容易忘記"},
+ /* 句型量詞（課本句型單元用到，一併納入練習） */
+ {n:null, w:"棵", z:"ㄎㄜ", p:"kē", e:"measure word (a tree)", d:"樹木的量詞，如「一棵大樹」", extra:true},
+ {n:null, w:"件", z:"ㄐㄧㄢˋ", p:"jiàn", e:"measure word (an item)", d:"物品的量詞，如「一件寶物」", extra:true}
+];
+
+/* 習寫漢字：字／注音／拼音／筆畫數／部首 */
+var HANZI = [
+ {c:"憶", z:"ㄧˋ", p:"yì", s:16, r:"心"},
+ {c:"紫", z:"ㄗˇ", p:"zǐ", s:12, r:"糸"},
+ {c:"朝", z:"ㄔㄠˊ", p:"cháo", s:12, r:"月"},
+ {c:"皇", z:"ㄏㄨㄤˊ", p:"huáng", s:9, r:"白"},
+ {c:"宮", z:"ㄍㄨㄥ", p:"gōng", s:10, r:"宀"},
+ {c:"寶", z:"ㄅㄠˇ", p:"bǎo", s:20, r:"宀"},
+ {c:"玉", z:"ㄩˋ", p:"yù", s:5, r:"玉"},
+ {c:"刻", z:"ㄎㄜ", p:"kē", s:8, r:"刀"},
+ {c:"幅", z:"ㄈㄨˊ", p:"fú", s:12, r:"巾"},
+ {c:"栩", z:"ㄒㄩˇ", p:"xǔ", s:10, r:"木"}
+];
+
+/* 認讀漢字 */
+var READ = [
+ {c:"帝", z:"ㄉㄧˋ", p:"dì"},
+ {c:"藏", z:"ㄘㄤˊ", p:"cáng"},
+ {c:"戰", z:"ㄓㄢˋ", p:"zhàn", sc:"战"},
+ {c:"爭", z:"ㄓㄥ", p:"zhēng", sc:"争"},
+ {c:"翠", z:"ㄘㄨㄟˋ", p:"cuì"},
+ {c:"鼎", z:"ㄉㄧㄥˇ", p:"dǐng"}
+];
+
+/* 選詞填空：句子（＿＿為空格）／答案。全部取自課文與句型例句 */
+var SENTS = [
+ ["去年暑假回臺灣的時候，我們全家去了臺北的＿＿。","故宮博物院"],
+ ["去故宮那一天，是一個很難忘的＿＿。","回憶"],
+ ["「故宮」以前是＿＿。","紫禁城"],
+ ["紫禁城是＿＿和清朝皇帝居住的皇宮。","明朝"],
+ ["紫禁城是明朝和＿＿皇帝居住的皇宮。","清朝"],
+ ["紫禁城是明朝和清朝＿＿居住的皇宮。","皇帝"],
+ ["紫禁城是明朝和清朝皇帝居住的＿＿。","皇宮"],
+ ["西元1911年建立了中華民國以後，＿＿叫「故宮」。","改名"],
+ ["紫禁城變成博物館，＿＿了很多寶物。","收藏"],
+ ["紫禁城變成博物館，收藏了很多＿＿。","寶物"],
+ ["後來因為＿＿的關係，把寶物搬到了臺灣。","戰爭"],
+ ["臺北故宮＿＿著五千年的藝術品。","保存"],
+ ["臺北故宮保存著五千年的＿＿。","藝術品"],
+ ["臺北故宮的藝術品多＿六十五萬件以上。","達"],
+ ["故宮三寶中最受歡迎的是＿＿。","翠玉白菜"],
+ ["三寶中看起來像一塊東坡肉的是＿＿。","肉形石"],
+ ["三寶中內壁刻著長篇銘文的青銅器是＿＿。","毛公鼎"],
+ ["翠玉白菜是＿＿玉本來的顏色刻出一棵白菜。","利用"],
+ ["＿＿一看，綠色的菜葉上還有蟲呢！","仔細"],
+ ["綠色的＿＿上還有蟲呢！","菜葉"],
+ ["綠色的菜葉上還有一隻＿呢！","蟲"],
+ ["另外，有一＿很長的畫。","幅"],
+ ["那幅很長的畫叫「＿＿」。","清明上河圖"],
+ ["畫中還畫了很多的動物、船、＿＿、樹木。","房屋"],
+ ["這幅畫裡的人和動物都＿＿＿＿，好像活的一樣。","栩栩如生"],
+ ["這幅畫讓我印象很＿＿。","深刻"],
+ ["玉工＿出一棵白菜，連菜葉上的蟲都看得清楚。","刻"],
+ ["好累呀，我們到那一＿大樹下休息一會兒吧！","棵"],
+ ["故宮博物院每一＿寶物都值得好好地欣賞。","件"],
+ ["臺北101大樓高＿一百零一層樓。","達"]
+];
+
+/* ============================================================
+   二、索引
+   ============================================================ */
+var BY_W = {}, CHARZ = {}, CHARINFO = {};
+WORDS.forEach(function(o){
+  BY_W[o.w] = o;
+  var zs = o.z.split(/\s+/);
+  for(var i=0;i<o.w.length;i++){
+    var c = o.w.charAt(i);
+    if(!CHARZ[c] && zs[i]) CHARZ[c] = zs[i];
+  }
+});
+HANZI.forEach(function(h){ CHARZ[h.c] = h.z; CHARINFO[h.c] = h; });
+READ.forEach(function(h){ if(!CHARZ[h.c]) CHARZ[h.c] = h.z; });
+
+var ALL_CHARS = (function(){
+  var m = {}, out = [];
+  WORDS.forEach(function(o){
+    for(var i=0;i<o.w.length;i++){ var c=o.w.charAt(i); if(!m[c]){ m[c]=1; out.push(c); } }
+  });
+  READ.forEach(function(h){ if(!m[h.c]){ m[h.c]=1; out.push(h.c); } });
+  return out;
+})();
+
+/* ============================================================
+   三、頁面內容填入
+   ============================================================ */
+var $ = function(id){ return document.getElementById(id); };
+function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+$("lesson-text").innerHTML = TEXT.map(function(p){ return "<p>"+esc(p)+"</p>"; }).join("");
+
+$("vocab-table").innerHTML =
+  "<tr><th></th><th>生詞</th><th>注音</th><th>拼音</th><th>英譯</th></tr>" +
+  WORDS.filter(function(o){ return o.n; }).map(function(o){
+    return "<tr><td class='n'>"+o.n+"</td><td class='w'>"+esc(o.w)+"</td>"+
+           "<td class='z'>"+esc(o.z)+"</td><td class='e'>"+esc(o.p)+"</td>"+
+           "<td class='e'>"+esc(o.e)+"</td></tr>";
+  }).join("");
+
+$("hanzi-chips").innerHTML = HANZI.map(function(h){
+  return "<span class='chip'>"+h.c+"<small>"+h.z+"　"+h.s+"畫　"+h.r+"部</small></span>";
+}).join("");
+$("read-chips").innerHTML = READ.map(function(h){
+  return "<span class='chip'>"+h.c+(h.sc?"（"+h.sc+"）":"")+"<small>"+h.z+"</small></span>";
+}).join("");
+
+/* ============================================================
+   三之二、成績上傳（Google 試算表）
+   ============================================================ */
+function endpoint(){
+  var v = ($("p-endpoint").value || "").trim();
+  return v || DEFAULT_ENDPOINT || "";
+}
+function token(){
+  var v = ($("p-token").value || "").trim();
+  return v || DEFAULT_TOKEN || "";
+}
+function withToken(url, extra){
+  var q = [];
+  if(extra) q.push(extra);
+  if(token()) q.push("token=" + encodeURIComponent(token()));
+  if(!q.length) return url;
+  return url + (url.indexOf("?") < 0 ? "?" : "&") + q.join("&");
+}
+function setSync(msg, cls){
+  var el = $("sync");
+  el.textContent = msg || "";
+  el.className = "sync" + (cls ? " " + cls : "");
+}
+function queueGet(){ try{ return JSON.parse(lsGet(LS.q,"[]")) || []; }catch(e){ return []; } }
+function queueSet(a){ lsSet(LS.q, JSON.stringify(a.slice(-80))); }
+
+/* 以 text/plain 送出 JSON，避開 CORS 預檢；若讀不到回應就改用 no-cors 盲送 */
+function send(rec){
+  var url = endpoint();
+  if(!url) return Promise.reject(new Error("no-endpoint"));
+  var payload = {};
+  for(var k in rec) if(Object.prototype.hasOwnProperty.call(rec,k)) payload[k] = rec[k];
+  payload.token = token();          // 通行碼在送出時才加，不存進待上傳佇列
+  var body = JSON.stringify(payload);
+  var opt = {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:body};
+  return fetch(url, opt).then(function(r){ return r.json(); }).then(function(o){
+    if(o && o.ok) return o;
+    var m = (o && o.error) ? o.error : "server";
+    var err = new Error(m);
+    err.fatal = /token/.test(m);   // 通行碼錯就不必重試，也不必暫存
+    throw err;
+  }).catch(function(err){
+    if(err && err.fatal) throw err;
+    return fetch(url, {method:"POST", mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"}, body:body})
+      .then(function(){ return {ok:true, blind:true}; });
+  });
+}
+
+function upload(rec){
+  if(!endpoint()){
+    setSync("未設定試算表網址，本局成績只顯示在畫面上。");
+    return;
+  }
+  setSync("成績上傳中…","busy");
+  send(rec).then(function(o){
+    setSync(o.blind ? "成績已送出（無法確認結果，請開試算表查看）。"
+                    : "成績已寫入 Google 試算表。", "ok");
+  }, function(err){
+    if(err && err.fatal){
+      setSync("通行碼不符，成績沒有寫入。請在設定裡確認通行碼與 Apps Script 的 TOKEN 相同。","bad");
+      return;
+    }
+    var q = queueGet(); q.push(rec); queueSet(q);
+    setSync("上傳失敗，已暫存在本機（共 "+q.length+" 筆），連上網後按「補傳待上傳成績」即可。","bad");
+  });
+}
+
+function flushQueue(silent){
+  var q = queueGet();
+  if(!q.length){ if(!silent) setSync("目前沒有待上傳的成績。"); return; }
+  if(!endpoint()){ if(!silent) setSync("請先填入試算表網址。","bad"); return; }
+  setSync("補傳 "+q.length+" 筆成績…","busy");
+  var left = [], i = 0;
+  (function next(){
+    if(i >= q.length){
+      queueSet(left);
+      setSync(left.length ? "仍有 "+left.length+" 筆補傳失敗。" : "待上傳成績已全部補傳完成。",
+              left.length ? "bad" : "ok");
+      return;
+    }
+    var rec = q[i++];
+    send(rec).then(next, function(){ left.push(rec); next(); });
+  })();
+}
+
+function loadLeaderboard(){
+  var url = endpoint(), msg = $("lb-msg"), tb = $("lb-table");
+  tb.innerHTML = "";
+  if(!url){ msg.textContent = "尚未設定試算表網址，無法讀取排行榜。"; return; }
+  msg.textContent = "讀取中…";
+  fetch(withToken(url, "top=15"))
+    .then(function(r){ return r.json(); })
+    .then(function(o){
+      if(o && o.ok === false && /token/.test(o.error || "")){
+        msg.textContent = "通行碼不符，無法讀取排行榜。";
+        return;
+      }
+      if(!o || !o.ok || !o.list) throw new Error("bad");
+      if(!o.list.length){ msg.textContent = "試算表裡還沒有成績。"; return; }
+      msg.textContent = "共 " + o.count + " 筆紀錄，以下為每個人的最高分。";
+      tb.innerHTML = "<tr><th></th><th>姓名</th><th>班級</th><th class='sc'>最高分</th><th class='sc'>答對</th></tr>" +
+        o.list.map(function(x,i){
+          return "<tr><td class='r'>"+(i+1)+"</td><td>"+esc(x.name||"")+"</td><td>"+esc(x.cls||"")+
+                 "</td><td class='sc'>"+x.score+"</td><td class='sc'>"+x.right+"</td></tr>";
+        }).join("");
+    })
+    .catch(function(){
+      msg.textContent = "讀不到排行榜。請確認網址正確，且部署時「誰可以存取」設為「任何人」。";
+    });
+}
+
+/* ============================================================
+   四、遊戲
+   ============================================================ */
+var cv = $("cv"), ctx = cv.getContext("2d"), veil = $("veil");
+var COLS = 18, ROWS = 14, cell = 30;
+
+var START_HTML =
+  '<h2>逛故宮，學生詞</h2>' +
+  '<p>吃下正確的詞語得分，吃錯扣一顆心；撞到宮牆或咬到自己就結束。</p>' +
+  '<p class="keys">鍵盤方向鍵或 WASD ／ 手機直接在畫面上滑動，也可按下方方向鍵</p>' +
+  '<button class="primary" data-act="start">開始遊戲</button>';
+
+var S = {
+  phase:"idle", snake:[], dir:{x:1,y:0}, pending:null, foods:[],
+  score:0, combo:0, best:0, right:0, life:3,
+  q:null, orderWord:null, orderIdx:0, wrong:[], flash:null, acc:0, last:0, t0:0
+};
+
+function speed(){
+  var r = document.querySelector('input[name="spd"]:checked');
+  return r ? parseInt(r.value,10) : 170;
+}
+function zhuyinOn(){ return $("opt-zhuyin").checked; }
+function enOn(){ return $("opt-en").checked; }
+
+function activeModes(){
+  var m = [];
+  if($("m-mean").checked) m.push("mean");
+  if($("m-cloze").checked) m.push("cloze");
+  if($("m-order").checked) m.push("order");
+  if(!m.length) m.push("mean");
+  return m;
+}
+function shuffle(a){
+  for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)), t=a[i]; a[i]=a[j]; a[j]=t; }
+  return a;
+}
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+
+/* ---------- 食物擺放 ---------- */
+function spanFor(n){ return n<=3 ? 3 : n<=5 ? 5 : 7; }
+
+function placeFoods(items){
+  var used = {}, i;
+  for(i=0;i<S.snake.length;i++) used[S.snake[i].x+","+S.snake[i].y] = 1;
+  var head = S.snake[0];
+  for(i=1;i<=3;i++) used[(head.x+S.dir.x*i)+","+(head.y+S.dir.y*i)] = 1;
+
+  var out = [];
+  items.forEach(function(it){
+    var span = spanFor(it.label.length), h = (span-1)/2, ok2 = false;
+    for(var t=0;t<900 && !ok2;t++){
+      var cy = 1 + Math.floor(Math.random()*(ROWS-2));
+      var range = COLS - 2*h - 2;
+      if(range < 1) range = 1;
+      var cx = h + 1 + Math.floor(Math.random()*range);
+      var ok = true;
+      for(var dx=-h-1; dx<=h+1 && ok; dx++)
+        for(var dy=-1; dy<=1 && ok; dy++)
+          if(used[(cx+dx)+","+(cy+dy)]) ok = false;
+      if(ok){
+        for(var ax=-h-1; ax<=h+1; ax++)
+          for(var ay=-1; ay<=1; ay++) used[(cx+ax)+","+(cy+ay)] = 1;
+        out.push({label:it.label, zhuyin:it.zhuyin||"", correct:!!it.correct, cx:cx, cy:cy, h:h, span:span});
+        ok2 = true;
+      }
+    }
+  });
+  return out;
+}
+
+/* ---------- 出題 ---------- */
+function otherWords(answer,n){
+  var pool = WORDS.filter(function(o){ return o.w !== answer; });
+  shuffle(pool);
+  return pool.slice(0,n);
+}
+function wordFoods(row){
+  var items = [{label:row.w, zhuyin:row.z, correct:true}];
+  otherWords(row.w,3).forEach(function(o){ items.push({label:o.w, zhuyin:o.z, correct:false}); });
+  return placeFoods(shuffle(items));
+}
+
+function newQuestion(){
+  var mode = pick(activeModes());
+  if(mode === "order") return qOrder();
+  if(mode === "cloze") return qCloze();
+  return qMean();
+}
+
+function qMean(){
+  var row = pick(WORDS);
+  S.foods = wordFoods(row);
+  S.q = {kind:"mean", answer:row.w, row:row};
+  $("q-tag").textContent = "看意思　吃正確的詞";
+  $("q-prompt").innerHTML = "<b>" + esc(row.d) + "</b>" + (enOn() ? "　<s>"+esc(row.e)+"</s>" : "");
+  $("q-hint").textContent = "答案共 " + row.w.length + " 個字";
+}
+
+function qCloze(){
+  var s = pick(SENTS), row = BY_W[s[1]];
+  if(!row) return qMean();
+  S.foods = wordFoods(row);
+  S.q = {kind:"cloze", answer:row.w, row:row};
+  $("q-tag").textContent = "選詞填空";
+  $("q-prompt").innerHTML = esc(s[0]).replace(/[＿_]+/, "<em>？</em>");
+  $("q-hint").textContent = "把空格裡該填的詞吃下來（" + row.w.length + " 個字）";
+}
+
+function qOrder(){
+  var pool = WORDS.filter(function(o){ return o.w.length >= 2; });
+  var row = pick(pool);
+  S.orderWord = row; S.orderIdx = 0;
+  S.q = {kind:"order", answer:row.w, row:row};
+  $("q-tag").textContent = "照字序吃字";
+  layoutOrder();
+}
+
+function layoutOrder(){
+  var row = S.orderWord, w = row.w, idx = S.orderIdx, need = w.charAt(idx);
+  var bad = {}; bad[need] = 1;
+  var pool = ALL_CHARS.filter(function(c){ return !bad[c]; });
+  shuffle(pool);
+  var items = [{label:need, zhuyin:CHARZ[need]||"", correct:true}];
+  for(var i=0;i<3 && i<pool.length;i++) items.push({label:pool[i], zhuyin:CHARZ[pool[i]]||"", correct:false});
+  S.foods = placeFoods(shuffle(items));
+
+  var done = w.slice(0,idx), rest = w.slice(idx+1).replace(/./g,"○");
+  $("q-prompt").innerHTML = "依序吃出　<b>"+esc(done)+"</b><em>"+esc(need)+"</em><s>"+rest+"</s>";
+  var info = CHARINFO[need];
+  $("q-hint").textContent = row.z + "　" + row.e +
+    (info ? "　｜　「"+need+"」"+info.s+"畫，"+info.r+"部" : "");
+}
+
+/* ---------- 流程 ---------- */
+function reset(){
+  var mid = Math.floor(ROWS/2);
+  S.snake = [{x:4,y:mid},{x:3,y:mid},{x:2,y:mid}];
+  S.dir = {x:1,y:0}; S.pending = null;
+  S.score = 0; S.combo = 0; S.right = 0; S.life = 3;
+  S.wrong = []; S.flash = null; S.acc = 0;
+  hud(); newQuestion();
+}
+function start(){
+  reset(); S.phase = "play"; veil.hidden = true;
+  S.t0 = Date.now(); setSync("");
+  S.last = performance.now(); requestAnimationFrame(loop);
+}
+
+function modesLabel(){
+  var m = [];
+  if($("m-mean").checked) m.push("看意思");
+  if($("m-cloze").checked) m.push("填空");
+  if($("m-order").checked) m.push("字序");
+  return m.join("＋") || "看意思";
+}
+function speedLabel(){
+  var v = speed();
+  return v >= 230 ? "慢" : v >= 170 ? "中" : "快";
+}
+function hud(){
+  $("s-score").textContent = S.score;
+  $("s-combo").textContent = S.combo;
+  $("s-right").textContent = S.right;
+  $("s-life").textContent = S.life > 0 ? new Array(S.life+1).join("♥") : "—";
+}
+function noteWrong(row){
+  if(!row) return;
+  for(var i=0;i<S.wrong.length;i++) if(S.wrong[i].w === row.w) return;
+  S.wrong.push(row);
+}
+function setDir(x,y){
+  if(S.phase !== "play") return;
+  if(x === -S.dir.x && y === -S.dir.y) return;
+  S.pending = {x:x, y:y};
+}
+function foodAt(x,y){
+  for(var i=0;i<S.foods.length;i++){
+    var f = S.foods[i];
+    if(y === f.cy && x >= f.cx-f.h && x <= f.cx+f.h) return f;
+  }
+  return null;
+}
+
+function step(){
+  if(S.pending){ S.dir = S.pending; S.pending = null; }
+  var head = S.snake[0], nx = head.x+S.dir.x, ny = head.y+S.dir.y;
+  if(nx<0 || ny<0 || nx>=COLS || ny>=ROWS) return over("撞到宮牆了");
+  for(var i=0;i<S.snake.length-1;i++)
+    if(S.snake[i].x===nx && S.snake[i].y===ny) return over("咬到自己了");
+
+  S.snake.unshift({x:nx,y:ny});
+  var f = foodAt(nx,ny);
+  if(!f){ S.snake.pop(); return; }
+
+  if(f.correct){
+    S.flash = {color:"#7fa88c", until:performance.now()+220};
+    if(S.q.kind === "order"){
+      S.orderIdx++; S.score += 4;
+      if(S.orderIdx >= S.orderWord.w.length){
+        S.score += 12; S.combo++; S.right++;
+        if(S.combo > S.best) S.best = S.combo;
+        newQuestion();
+      }else layoutOrder();
+    }else{
+      S.score += 10 + Math.min(10, S.combo*2);
+      S.combo++; S.right++;
+      if(S.combo > S.best) S.best = S.combo;
+      newQuestion();
+    }
+  }else{
+    S.flash = {color:"#c8402f", until:performance.now()+300};
+    S.snake.pop();
+    S.combo = 0;
+    S.score = Math.max(0, S.score-5);
+    S.life--;
+    noteWrong(S.q.row);
+    if(S.life <= 0){ hud(); return over("生命用完了"); }
+    if(S.q.kind === "order") layoutOrder();
+    else S.foods = placeFoods(shuffle(S.foods.map(function(x){
+      return {label:x.label, zhuyin:x.zhuyin, correct:x.correct};
+    })));
+  }
+  hud();
+}
+
+function over(reason){
+  S.phase = "over";
+  var h = '<h2>遊戲結束</h2><p>'+esc(reason)+'　　分數 <b style="color:var(--gold)">'+S.score+
+          '</b>　答對 '+S.right+' 題　最長連對 '+S.best+'</p>';
+  if(S.wrong.length){
+    h += '<p style="color:var(--vermilion)">錯題複習（'+S.wrong.length+' 個詞）</p><div class="review">';
+    S.wrong.forEach(function(r){
+      h += '<div class="row"><div class="w">'+esc(r.w)+'<span class="z">'+esc(r.z)+'</span></div>'+
+           '<div class="d">'+esc(r.d)+'　'+esc(r.e)+'</div></div>';
+    });
+    h += '</div>';
+  }else if(S.right > 0){
+    h += '<p style="color:var(--jade)">全部答對，一個錯題都沒有，很厲害！</p>';
+  }
+  h += '<button class="primary" data-act="start">再玩一次</button>';
+  veil.innerHTML = h; veil.hidden = false; draw();
+
+  upload({
+    id   : "s" + Date.now().toString(36) + Math.random().toString(36).slice(2,8),
+    name : ($("p-name").value || "").trim() || "（未填姓名）",
+    cls  : ($("p-class").value || "").trim(),
+    score: S.score,
+    right: S.right,
+    best : S.best,
+    modes: modesLabel(),
+    speed: speedLabel(),
+    seconds: S.t0 ? Math.round((Date.now() - S.t0) / 1000) : 0,
+    wrongCount: S.wrong.length,
+    wrong: S.wrong.map(function(r){ return r.w; }).join("、"),
+    reason: reason,
+    lesson: "第九冊 第十課 故宮博物院",
+    ua: (navigator.userAgent || "").slice(0,120)
+  });
+}
+
+function togglePause(){
+  if(S.phase === "play"){
+    S.phase = "pause";
+    veil.innerHTML = '<h2>暫停</h2><p>按空白鍵或下面的按鈕繼續。</p>'+
+                     '<button class="primary" data-act="resume">繼續</button>';
+    veil.hidden = false;
+  }else if(S.phase === "pause"){
+    S.phase = "play"; veil.hidden = true;
+    S.last = performance.now(); requestAnimationFrame(loop);
+  }else{
+    start();
+  }
+}
+
+function loop(now){
+  if(S.phase !== "play") return;
+  S.acc += now - S.last; S.last = now;
+  var ms = speed();
+  while(S.acc >= ms){
+    S.acc -= ms; step();
+    if(S.phase !== "play") return;
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+
+/* ---------- 繪圖 ---------- */
+function resize(){
+  var w = cv.parentNode.clientWidth;
+  cell = Math.max(18, Math.floor(w / COLS));
+  cv.width = cell*COLS; cv.height = cell*ROWS;
+  draw();
+}
+window.addEventListener("resize", resize);
+
+function roundRect(x,y,w,h,r){
+  r = Math.min(r, w/2, h/2);
+  ctx.beginPath();
+  ctx.moveTo(x+r,y);
+  ctx.arcTo(x+w,y,x+w,y+h,r);
+  ctx.arcTo(x+w,y+h,x,y+h,r);
+  ctx.arcTo(x,y+h,x,y,r);
+  ctx.arcTo(x,y,x+w,y,r);
+  ctx.closePath();
+}
+function dot(x,y,r){ ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill(); }
+function jade(t){
+  return "rgb("+Math.round(127-34*t)+","+Math.round(168-46*t)+","+Math.round(140-38*t)+")";
+}
+
+function draw(){
+  var W = cv.width, H = cv.height;
+  ctx.clearRect(0,0,W,H);
+  ctx.fillStyle = "#12100f"; ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle = "rgba(216,169,75,.07)"; ctx.lineWidth = 1;
+  for(var x=1;x<COLS;x++){ ctx.beginPath(); ctx.moveTo(x*cell+.5,0); ctx.lineTo(x*cell+.5,H); ctx.stroke(); }
+  for(var y=1;y<ROWS;y++){ ctx.beginPath(); ctx.moveTo(0,y*cell+.5); ctx.lineTo(W,y*cell+.5); ctx.stroke(); }
+
+  var SERIF = '"Noto Serif CJK TC","Noto Serif TC","Songti TC","PMingLiU",serif';
+  var SANS  = '"Noto Sans CJK TC","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif';
+
+  S.foods.forEach(function(f){
+    var zy = zhuyinOn() && !!f.zhuyin;
+    var bw = f.span*cell, bh = cell*(zy ? 1.5 : 1.22);
+    var bx = (f.cx-f.h)*cell, by = f.cy*cell + (cell-bh)/2;
+    var pad = Math.max(2, cell*.08);
+
+    ctx.fillStyle = "#f2e8d5";
+    ctx.strokeStyle = "#c8402f";
+    ctx.lineWidth = Math.max(1.4, cell*.06);
+    roundRect(bx+pad, by, bw-pad*2, bh, Math.max(3, cell*.12));
+    ctx.fill(); ctx.stroke();
+
+    var n = f.label.length;
+    var inner = bw - pad*2 - cell*.24;
+    var fs = Math.min(cell*.62, inner/n);
+    var slot = inner/n, left = bx + bw/2 - inner/2;
+    var baseY = by + bh/2 + (zy ? bh*.13 : 0);
+
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillStyle = "#171210";
+    ctx.font = "700 " + fs.toFixed(1) + "px " + SERIF;
+    for(var i=0;i<n;i++) ctx.fillText(f.label.charAt(i), left + slot*(i+.5), baseY);
+
+    if(zy){
+      var zs = f.zhuyin.split(/\s+/);
+      var zy0 = Math.max(6, Math.min(cell*.26, slot*.55));
+      ctx.fillStyle = "#8a6a2f";
+      for(var k=0;k<n;k++){
+        var t = zs[k] || "";
+        if(!t) continue;
+        var zf = zy0;
+        ctx.font = "500 " + zf.toFixed(1) + "px " + SANS;
+        var wpx = ctx.measureText(t).width;
+        if(wpx > slot*.96){
+          zf = Math.max(5.5, zf * (slot*.96) / wpx);
+          ctx.font = "500 " + zf.toFixed(1) + "px " + SANS;
+        }
+        ctx.fillText(t, left + slot*(k+.5), by + bh*.24);
+      }
+    }
+  });
+
+  for(var i=S.snake.length-1;i>=0;i--){
+    var s = S.snake[i], t = i/Math.max(1,S.snake.length-1);
+    var px = s.x*cell, py = s.y*cell, ins = i===0 ? cell*.05 : cell*.12;
+    ctx.fillStyle = i===0 ? "#d8a94b" : jade(t);
+    roundRect(px+ins, py+ins, cell-ins*2, cell-ins*2, cell*.22);
+    ctx.fill();
+    if(i===0){
+      ctx.fillStyle = "#17100f";
+      var r = Math.max(1.2, cell*.07);
+      var ex = px+cell/2 + S.dir.x*cell*.17, ey = py+cell/2 + S.dir.y*cell*.17;
+      var ox = S.dir.x!==0 ? 0 : cell*.17, oy = S.dir.x!==0 ? cell*.17 : 0;
+      dot(ex+ox, ey+oy, r); dot(ex-ox, ey-oy, r);
+    }
+  }
+
+  if(S.flash && performance.now() < S.flash.until){
+    ctx.fillStyle = S.flash.color; ctx.globalAlpha = .13;
+    ctx.fillRect(0,0,W,H); ctx.globalAlpha = 1;
+  }
+}
+
+/* ---------- 操作 ---------- */
+var KEYS = {
+  ArrowUp:[0,-1], ArrowDown:[0,1], ArrowLeft:[-1,0], ArrowRight:[1,0],
+  w:[0,-1], s:[0,1], a:[-1,0], d:[1,0], W:[0,-1], S:[0,1], A:[-1,0], D:[1,0]
+};
+document.addEventListener("keydown", function(e){
+  if(e.target && /TEXTAREA|INPUT|SELECT/.test(e.target.tagName)) return;
+  if(e.key === " " || e.code === "Space"){ e.preventDefault(); togglePause(); return; }
+  var k = KEYS[e.key];
+  if(k){ e.preventDefault(); setDir(k[0],k[1]); }
+});
+
+var DIRS = {u:[0,-1], d:[0,1], l:[-1,0], r:[1,0]};
+Array.prototype.forEach.call(document.querySelectorAll(".pad button"), function(b){
+  b.addEventListener("click", function(){
+    var v = DIRS[b.getAttribute("data-dir")];
+    setDir(v[0], v[1]);
+  });
+});
+
+var t0 = null;
+cv.addEventListener("touchstart", function(e){
+  var t = e.changedTouches[0]; t0 = {x:t.clientX, y:t.clientY};
+}, {passive:true});
+cv.addEventListener("touchmove", function(e){ e.preventDefault(); }, {passive:false});
+cv.addEventListener("touchend", function(e){
+  if(!t0) return;
+  var t = e.changedTouches[0], dx = t.clientX-t0.x, dy = t.clientY-t0.y;
+  t0 = null;
+  if(Math.abs(dx) < 18 && Math.abs(dy) < 18) return;
+  if(Math.abs(dx) > Math.abs(dy)) setDir(dx>0?1:-1, 0);
+  else setDir(0, dy>0?1:-1);
+}, {passive:true});
+
+veil.addEventListener("click", function(e){
+  var b = e.target.closest ? e.target.closest("button[data-act]") : null;
+  if(!b) return;
+  if(b.getAttribute("data-act") === "start") start();
+  else togglePause();
+});
+
+$("btn-pause").addEventListener("click", togglePause);
+$("btn-restart").addEventListener("click", start);
+
+["m-mean","m-cloze","m-order","opt-zhuyin","opt-en"].forEach(function(id){
+  $(id).addEventListener("change", function(){
+    if(S.phase === "play" || S.phase === "pause") newQuestion();
+    draw();
+  });
+});
+
+/* ---------- 成績上傳相關事件 ---------- */
+$("p-name").value = lsGet(LS.nm,"");
+$("p-class").value = lsGet(LS.cl,"");
+$("p-endpoint").value = lsGet(LS.ep, DEFAULT_ENDPOINT);
+$("p-token").value = lsGet(LS.tk, DEFAULT_TOKEN);
+
+$("p-name").addEventListener("input", function(){ lsSet(LS.nm, this.value); });
+$("p-class").addEventListener("input", function(){ lsSet(LS.cl, this.value); });
+$("p-endpoint").addEventListener("input", function(){ lsSet(LS.ep, this.value.trim()); });
+$("p-token").addEventListener("input", function(){ lsSet(LS.tk, this.value.trim()); });
+
+$("btn-test").addEventListener("click", function(){
+  var url = endpoint();
+  if(!url){ setSync("請先貼上結尾是 /exec 的網址。","bad"); return; }
+  setSync("測試連線中…","busy");
+  fetch(withToken(url)).then(function(r){ return r.json(); }).then(function(o){
+    if(o && o.ok) setSync("連線成功，試算表目前有 " + o.count + " 筆紀錄。","ok");
+    else if(o && /token/.test(o.error || "")) setSync("連線成功，但通行碼不符。請確認與 Apps Script 裡 TOKEN 那一行相同。","bad");
+    else setSync("連線到了，但回應格式不正確，請確認程式碼已貼完整。","bad");
+  }, function(){
+    setSync("無法讀取回應。上傳成績通常仍可運作，請先玩一局，再開試算表確認。","bad");
+  });
+});
+$("btn-flush").addEventListener("click", function(){ flushQueue(false); });
+
+$("lb-box").addEventListener("toggle", function(){
+  if(this.open) loadLeaderboard();
+});
+
+/* ---------- 啟動 ---------- */
+veil.innerHTML = START_HTML;
+reset();
+S.phase = "idle";
+resize();
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+(function(){
+  var n = queueGet().length;
+  if(n && endpoint()) flushQueue(true);
+  else if(n) setSync("有 " + n + " 筆成績尚未上傳，請在設定裡填入試算表網址後補傳。","bad");
+})();
+})();
+</script>
+</body>
+</html>
