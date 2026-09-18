@@ -45,7 +45,9 @@ td.en{color:var(--muted)}
 #review h3{font-size:14px;margin:0 0 4px;color:var(--accent)}
 #sayBtn,#pauseBtn{position:absolute;top:13.8%;margin:0;padding:4px 10px;font-size:13px;background:rgba(9,17,30,.7);color:var(--ink);border:1px solid var(--line);font-weight:500}
 #sayBtn{left:8px}#pauseBtn{right:8px}
-#loopBtn{position:absolute;right:14px;bottom:60px;width:72px;height:72px;border-radius:50%;margin:0;padding:0;background:rgba(232,182,74,.8);font-size:16px;touch-action:manipulation}
+#loopBtn{position:absolute;right:16px;bottom:112px;width:56px;height:56px;border-radius:50%;margin:0;padding:0;background:rgba(232,182,74,.72);font-size:14px;touch-action:manipulation}
+#fireBtn{position:absolute;right:10px;bottom:10px;width:84px;height:84px;border-radius:50%;margin:0;padding:0;background:rgba(217,72,59,.72);color:#fff;font-size:18px;border:2px solid rgba(255,255,255,.3);touch-action:manipulation;user-select:none}
+#fireBtn:active{background:rgba(240,110,95,.95)}
 </style>
 </head>
 <body>
@@ -77,7 +79,7 @@ td.en{color:var(--muted)}
       </details>
       <div class="help">
         <b>鍵盤：</b><kbd>←↑→↓</kbd>/<kbd>WASD</kbd> 移動　<kbd>空白鍵</kbd>/<kbd>Z</kbd> 射擊　<kbd>X</kbd> 迴旋閃避　<kbd>R</kbd> 再聽一次　<kbd>P</kbd> 暫停　<kbd>M</kbd> 靜音<br>
-        <b>觸控：</b>在畫面上拖曳移動並射擊，按「迴旋」鈕閃避<br>
+        <b>觸控：</b>拖曳畫面移動（不會射擊），按住右下角「射擊」鈕才發射，上方小圓鈕是「迴旋」閃避<br>
         每關 8 題，最後有頭目：擊中寫著正確答案的引擎才能打倒它。共 3 關。
       </div>
     </div>
@@ -116,6 +118,7 @@ td.en{color:var(--muted)}
 
   <button id="sayBtn" hidden>🔊 再聽</button>
   <button id="pauseBtn" hidden>暫停</button>
+  <button id="fireBtn" hidden>射擊</button>
   <button id="loopBtn" hidden>迴旋</button>
 </div></div>
 
@@ -238,12 +241,14 @@ addEventListener('keyup',e=>{keys[e.code]=false});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;if(state==='play')togglePause()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='play')togglePause()});
 
-let touchId=null,lastT={x:0,y:0},touchFire=false;
+let touchId=null,lastT={x:0,y:0},touchFire=false,usedTouch=false;
+function showTouchBtns(v){if(!usedTouch)return;$('fireBtn').hidden=!v;$('loopBtn').hidden=!v}
 function toLogical(e){const r=cvs.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
 cvs.addEventListener('pointerdown',e=>{
   if(state!=='play'||e.pointerType==='mouse')return;
-  $('loopBtn').hidden=false;
-  touchId=e.pointerId;lastT=toLogical(e);touchFire=true;
+  usedTouch=true;showTouchBtns(true);
+  if(touchId!==null)return;
+  touchId=e.pointerId;lastT=toLogical(e);
   try{cvs.setPointerCapture(e.pointerId)}catch(_){}
 });
 cvs.addEventListener('pointermove',e=>{
@@ -252,9 +257,13 @@ cvs.addEventListener('pointermove',e=>{
   if(!P.dead){P.x=clamp(P.x+(p.x-lastT.x)*1.35,16,W-16);P.y=clamp(P.y+(p.y-lastT.y)*1.35,130,H-30);P.bank=clamp((p.x-lastT.x)/4,-1,1)}
   lastT=p;
 });
-const endTouch=e=>{if(e.pointerId===touchId){touchId=null;touchFire=false}};
+const endTouch=e=>{if(e.pointerId===touchId)touchId=null};
 cvs.addEventListener('pointerup',endTouch);cvs.addEventListener('pointercancel',endTouch);
 $('loopBtn').addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();doLoop()});
+const FB=$('fireBtn');
+FB.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();usedTouch=true;touchFire=true;try{FB.setPointerCapture(e.pointerId)}catch(_){}});
+for(const ev of['pointerup','pointercancel','pointerleave'])FB.addEventListener(ev,e=>{e.preventDefault();touchFire=false});
+FB.addEventListener('contextmenu',e=>e.preventDefault());
 $('pauseBtn').addEventListener('click',()=>{if(state==='play'||state==='pause')togglePause()});
 $('resumeBtn').addEventListener('click',()=>{if(state==='pause')togglePause()});
 $('sayBtn').addEventListener('click',()=>replayAudio());
@@ -415,7 +424,7 @@ function askQuestion(){
   const n=G.phase==='boss'?3:4;
   const choices=shuffle([item,...distractors(item,n-1)]);
   if(G.phase==='boss'){
-    const B=G.boss;const slots=shuffle([{dx:-82,dy:44},{dx:0,dy:96},{dx:82,dy:44}]);
+    const B=G.boss;const slots=shuffle([{dx:-78,dy:44},{dx:0,dy:96},{dx:78,dy:44}]);
     B.slots=choices.map((c,i)=>({dx:slots[i].dx,dy:slots[i].dy,item:c,correct:c===item,hp:6,dead:false,flash:0}));
   }else{
     const cols=shuffle([0,1,2,3]);
@@ -524,7 +533,7 @@ function updEnemy(e){
       break;
     case'boss':{
       if(e.dying)break;
-      if(e.y<150)e.y+=1.6;else{e.mt++;e.x=W/2+Math.sin(e.mt*.01)*105}
+      if(e.y<150)e.y+=1.6;else{e.mt++;e.x=W/2+Math.sin(e.mt*.01)*88}
       for(const s of e.slots)if(s.flash>0)s.flash--;
       if(G.q&&!G.q.done&&!G.player.dead){
         if(--e.fire<=0){spread(e,3+S,.22,2.4+S*.2,60);e.fire=Math.max(70,(150-S*20))/G.sp}
@@ -656,7 +665,7 @@ function step(){
   // 正確答案飛到底部＝漏答
   if(G.phase==='wave'&&G.q&&!G.q.done){
     const c=G.enemies.find(e=>e.type==='word'&&e.correct&&!e.dead&&!e.leaving);
-    if(!c||c.y>H-40)missQuestion();
+    if(!c||c.y>H-120)missQuestion();
   }
   G.enemies=G.enemies.filter(e=>!e.dead&&!(e.y>H+60||(e.leaving&&(e.y<-80||e.fade<=0))));
   for(const it of G.items){it.t++;it.y+=1.1;it.x+=Math.sin(it.t*.05)*.7}
@@ -719,7 +728,7 @@ function drawHUD(){
   rrect(bx-2,by-2,bw+4,bh+4,3);ctx.fillStyle='rgba(0,0,0,.5)';ctx.fill();
   const e=P.energy/100;ctx.fillStyle=e>.5?'#6fd08c':e>.25?'#f2c14e':'#e8574a';ctx.fillRect(bx,by,bw*e,bh);
   txt(`迴旋 ×${P.loops}`,bx+bw+10,by-1,'left','#fff',13,'normal');
-  for(let i=0;i<G.lives;i++)drawP38(W-22-i*26,H-24,.55,1,false,0,0);
+  for(let i=0;i<G.lives;i++)drawP38(250+i*26,H-24,.55,1,false,0,0);
   if(G.boss&&!G.boss.dying&&G.boss.y>-40){
     const w=W-160,x=80,y=100;
     rrect(x-2,y-2,w+4,10,3);ctx.fillStyle='rgba(0,0,0,.55)';ctx.fill();
@@ -785,18 +794,20 @@ function showOnly(id){for(const s of['titleScreen','pauseScreen','overScreen'])$
 function startGame(){
   initAudio();G=newGame();initBG();state='play';showOnly(null);
   $('pauseBtn').hidden=false;$('sayBtn').hidden=true;
+  if(navigator.maxTouchPoints>0||'ontouchstart' in window)usedTouch=true;
+  showTouchBtns(true);
   banner('第 1 關　出擊！看題目，擊落正確答案',150);
 }
 function togglePause(){
-  if(state==='play'){state='pause';$('pauseScreen').hidden=false;if('speechSynthesis' in window)speechSynthesis.cancel()}
-  else if(state==='pause'){state='play';$('pauseScreen').hidden=true;initAudio()}
+  if(state==='play'){state='pause';touchFire=false;touchId=null;showTouchBtns(false);$('pauseScreen').hidden=false;if('speechSynthesis' in window)speechSynthesis.cancel()}
+  else if(state==='pause'){state='play';$('pauseScreen').hidden=true;showTouchBtns(true);initAudio()}
 }
 
 let lastResult=null;
 const byWord=new Map([...WORDS,...CHARS].map(o=>[o.kind+o.w,o]));
 function lookup(w){return byWord.get('word'+w)||byWord.get('char'+w)}
 function endGame(win){
-  state='over';$('pauseBtn').hidden=true;$('loopBtn').hidden=true;$('sayBtn').hidden=true;touchFire=false;touchId=null;
+  state='over';$('pauseBtn').hidden=true;$('loopBtn').hidden=true;$('fireBtn').hidden=true;$('sayBtn').hidden=true;touchFire=false;touchId=null;
   const s=G.stats,secs=Math.round((Date.now()-G.start)/1000);
   const acc=s.answered?Math.round(s.firstCorrect/s.answered*100):0;
   const avg=s.rt.length?s.rt.reduce((a,b)=>a+b,0)/s.rt.length:0;
