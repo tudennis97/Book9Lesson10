@@ -107,9 +107,6 @@ button.primary:hover{background:#d8523f;border-color:var(--gold)}
 .sync.ok{color:var(--jade)}
 .sync.bad{color:var(--vermilion)}
 .sync.busy{color:var(--gold)}
-input.wide{width:100%;background:#150f0e;color:var(--silk);border:1px solid var(--line);
-  padding:7px 9px;font-family:var(--sans);font-size:.78rem}
-input.wide:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
 .hintline{font-size:.72rem;color:var(--muted);line-height:1.7;margin:0 0 7px}
 .lb{width:100%;border-collapse:collapse;font-size:.82rem}
 .lb th,.lb td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left}
@@ -226,14 +223,9 @@ footer.note{margin-top:18px;padding-top:12px;border-top:1px solid var(--line);
         </div>
       </fieldset>
       <fieldset>
-        <legend>Google 試算表（成績上傳）</legend>
-        <p class="hintline">貼上 Apps Script 網頁應用程式的 <b>/exec</b> 網址，每局結束後會自動把成績寫進試算表；留空則只顯示在畫面上。網址與姓名、班級都存在這台裝置的瀏覽器裡。</p>
-        <input id="p-endpoint" class="wide" type="url" autocomplete="off"
-               placeholder="">
-        <p class="hintline" style="margin-top:8px">通行碼：要和 Apps Script 裡 <b>TOKEN</b> 那一行填的字串完全相同。兩邊都留空就不檢查。</p>
-        <input id="p-token" class="wide" type="text" autocomplete="off" spellcheck="false"
-               placeholder="">
-        <div class="opts" style="margin-top:8px">
+        <legend>成績上傳</legend>
+        <p class="hintline">每局結束後會自動把成績寫進老師的 Google 試算表。沒有網路時成績會先存在這台裝置，等連上線後按「補傳待上傳成績」即可。</p>
+        <div class="opts">
           <button id="btn-test">測試連線</button>
           <button id="btn-flush">補傳待上傳成績</button>
         </div>
@@ -283,6 +275,8 @@ footer.note{margin-top:18px;padding-top:12px;border-top:1px solid var(--line);
 
   <footer class="note">
     教材依據：僑務委員會《學華語向前走》第九冊（9B）第十課〈故宮博物院〉，課文、生詞、習寫漢字與句型均取自課本。<br>
+    本檔為單一純 HTML 檔案，除了把成績送到老師指定的 Google 試算表以外不連任何外部資源，
+    直接放進 GitHub repo 或 GitHub Pages 即可執行。
   </footer>
 </div>
 
@@ -292,17 +286,15 @@ footer.note{margin-top:18px;padding-top:12px;border-top:1px solid var(--line);
 
 /* ============================================================
    〇、Google 試算表設定
-   想讓全班共用同一個試算表、又不必每台裝置各自設定，
-   就把 /exec 網址與通行碼直接寫在下面兩行的引號中間。
-   通行碼必須和 Apps Script 裡的 TOKEN 完全一樣；兩邊都留空則不檢查。
+   以下兩行是全班共用的設定，遊戲畫面上不顯示、學生不能改。
+   要換試算表或換通行碼，就改這兩行（TOKEN 必須和 Apps Script
+   裡 var TOKEN 那一行完全相同），兩邊都留空則不檢查通行碼。
    ============================================================ */
-var DEFAULT_ENDPOINT = "https://script.google.com/macros/s/AKfycbzZDL01Yr6sKOrNgUwIiqfol5gbUME7ZissEdFL6NBZ3KlqWM_amZa9zjVF8Fhvgp-zjw/exec";
+var ENDPOINT = "https://script.google.com/macros/s/AKfycbzZDL01Yr6sKOrNgUwIiqfol5gbUME7ZissEdFL6NBZ3KlqWM_amZa9zjVF8Fhvgp-zjw/exec";
 
-var DEFAULT_TOKEN = "gugong2026";
+var TOKEN = "gugong2026";
 
 var LS = {
-  ep:"gugong-snake-endpoint",
-  tk:"gugong-snake-token",
   nm:"gugong-snake-name",
   cl:"gugong-snake-class",
   q :"gugong-snake-queue"
@@ -463,14 +455,8 @@ $("read-chips").innerHTML = READ.map(function(h){
 /* ============================================================
    三之二、成績上傳（Google 試算表）
    ============================================================ */
-function endpoint(){
-  var v = ($("p-endpoint").value || "").trim();
-  return v || DEFAULT_ENDPOINT || "";
-}
-function token(){
-  var v = ($("p-token").value || "").trim();
-  return v || DEFAULT_TOKEN || "";
-}
+function endpoint(){ return (ENDPOINT || "").trim(); }
+function token(){ return (TOKEN || "").trim(); }
 function withToken(url, extra){
   var q = [];
   if(extra) q.push(extra);
@@ -511,7 +497,7 @@ function send(rec){
 
 function upload(rec){
   if(!endpoint()){
-    setSync("未設定試算表網址，本局成績只顯示在畫面上。");
+    setSync("尚未設定試算表，本局成績只顯示在畫面上。");
     return;
   }
   setSync("成績上傳中…","busy");
@@ -520,7 +506,7 @@ function upload(rec){
                     : "成績已寫入 Google 試算表。", "ok");
   }, function(err){
     if(err && err.fatal){
-      setSync("通行碼不符，成績沒有寫入。請在設定裡確認通行碼與 Apps Script 的 TOKEN 相同。","bad");
+      setSync("成績沒有寫入（通行碼不符），請通知老師。","bad");
       return;
     }
     var q = queueGet(); q.push(rec); queueSet(q);
@@ -531,7 +517,7 @@ function upload(rec){
 function flushQueue(silent){
   var q = queueGet();
   if(!q.length){ if(!silent) setSync("目前沒有待上傳的成績。"); return; }
-  if(!endpoint()){ if(!silent) setSync("請先填入試算表網址。","bad"); return; }
+  if(!endpoint()){ if(!silent) setSync("尚未設定試算表，無法補傳。","bad"); return; }
   setSync("補傳 "+q.length+" 筆成績…","busy");
   var left = [], i = 0;
   (function next(){
@@ -1011,21 +997,17 @@ $("btn-restart").addEventListener("click", start);
 /* ---------- 成績上傳相關事件 ---------- */
 $("p-name").value = lsGet(LS.nm,"");
 $("p-class").value = lsGet(LS.cl,"");
-$("p-endpoint").value = lsGet(LS.ep, DEFAULT_ENDPOINT);
-$("p-token").value = lsGet(LS.tk, DEFAULT_TOKEN);
 
 $("p-name").addEventListener("input", function(){ lsSet(LS.nm, this.value); });
 $("p-class").addEventListener("input", function(){ lsSet(LS.cl, this.value); });
-$("p-endpoint").addEventListener("input", function(){ lsSet(LS.ep, this.value.trim()); });
-$("p-token").addEventListener("input", function(){ lsSet(LS.tk, this.value.trim()); });
 
 $("btn-test").addEventListener("click", function(){
   var url = endpoint();
-  if(!url){ setSync("請先貼上結尾是 /exec 的網址。","bad"); return; }
+  if(!url){ setSync("這個檔案尚未設定試算表網址。","bad"); return; }
   setSync("測試連線中…","busy");
   fetch(withToken(url)).then(function(r){ return r.json(); }).then(function(o){
     if(o && o.ok) setSync("連線成功，試算表目前有 " + o.count + " 筆紀錄。","ok");
-    else if(o && /token/.test(o.error || "")) setSync("連線成功，但通行碼不符。請確認與 Apps Script 裡 TOKEN 那一行相同。","bad");
+    else if(o && /token/.test(o.error || "")) setSync("連線成功，但通行碼不符。請確認檔案裡的 TOKEN 與 Apps Script 那一行相同。","bad");
     else setSync("連線到了，但回應格式不正確，請確認程式碼已貼完整。","bad");
   }, function(){
     setSync("無法讀取回應。上傳成績通常仍可運作，請先玩一局，再開試算表確認。","bad");
@@ -1046,7 +1028,7 @@ if(document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
 (function(){
   var n = queueGet().length;
   if(n && endpoint()) flushQueue(true);
-  else if(n) setSync("有 " + n + " 筆成績尚未上傳，請在設定裡填入試算表網址後補傳。","bad");
+  else if(n) setSync("有 " + n + " 筆成績尚未上傳，可按設定裡的「補傳待上傳成績」。","bad");
 })();
 })();
 </script>
